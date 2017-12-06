@@ -123,6 +123,8 @@ $app->post('/admin/users/create', function() {
 
 	$_POST["inadmin"] = (isset($_POST["inadmin"]))?1:0;
 
+	$_POST['despassword'] = password_hash($_POST["despassword"], PASSWORD_DEFAULT, ["cost"=>12]);
+
 	$user->setData($_POST);
 
 	$user->save();
@@ -151,7 +153,36 @@ $app->post('/admin/users/:iduser', function($iduser) {
 
 });
 
+$app->get('/admin/forgot', function() {
 
+	$page = new PageAdmin([
+		"header"=>false,
+		"footer"=>false
+	]);    
+	
+	$page->setTpl("forgot");
+
+});
+
+$app->post('/admin/forgot', function() {
+
+	$user = User::getForgot($_POST["email"]);
+
+	header("Location: /admin/forgot/sent");
+	exit;
+
+});
+
+$app->get('/admin/forgot/sent', function() {
+
+	$page = new PageAdmin([
+		"header"=>false,
+		"footer"=>false
+	]);    
+	
+	$page->setTpl("forgot-sent");
+
+});
 
 $app->run();
 
