@@ -37,7 +37,7 @@ class User extends Model {
 
 			return $user;
 
-		} else {
+		} else {	
 			throw new \Exception("Usuário inexistente ou senha inválida.");
 		}
 
@@ -183,7 +183,8 @@ class User extends Model {
     			$dataRecovery = $results2[0];
     		
     			$code = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, User::SECRET, $dataRecovery["idrecovery"], MCRYPT_MODE_ECB));
-    		
+    			// var_dump($code);
+
     			$link = "http://www.hcodecommerce.com.br/admin/forgot/reset?code=$code";
 
     			$mailer = new Mailer($data["desemail"], $data["desperson"], "Redefinir senha da Hcode Store", "forgot", array(
@@ -192,9 +193,11 @@ class User extends Model {
     			));	
 
     			$mailer->send();
-
-    			var_dump($mailer);
-				exit;
+                
+                return $data;
+                /*var_dump($mailer);
+                exit;*/
+    			
     		}
     	}
 
