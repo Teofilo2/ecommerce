@@ -75,7 +75,7 @@ class User extends Model {
 
 		$sql = new Sql();
 
-		return  $sql->select("SELECT * FROM tb_users a INNER JOIN tb_persons b USING(idperson) ORDER BY b.desperson");
+		return $sql->select("SELECT * FROM tb_users a INNER JOIN tb_persons b USING(idperson) ORDER BY b.desperson");
 
 	}
 
@@ -139,7 +139,7 @@ class User extends Model {
     	$sql = new Sql();
 
     	$sql->query("CALL sp_users_delete(:iduser)", array(
-    		"iduser"=>$this->getiduser()
+    		":iduser"=>$this->getiduser()
     	));
 
     }
@@ -200,6 +200,64 @@ class User extends Model {
     			
     		}
     	}
+
+    }
+
+    public static function validForgotDecrypt($code)
+    {
+        
+        $idrecovery = mcrypt_decrypt(MCRYPT_RIJNDAEL_128, User::SECRET,base64_decode($code), MCRYPT_MODE_ECB);
+
+        $sql = new Sql();
+
+        $results = $sql->select("
+            SELECT * 
+            FROM tb_userspasswordsrecoveries a
+            INNER JOIN  tb_users b USING(iduser)
+            INNER JOIN tb_persons c USING(idperson)
+            WHERE 
+                a.idrecovery = :idrecovery
+                AND 
+                a.dtrecovery IS NULL
+                AND 
+                DATE_ADD(a.dtregister, INTERVAL 1 HOUR) >= NOW();
+        ", array(
+            ":idrecovery"=>$idrecovery
+        ));
+
+        if (count($results) === 0) 
+        {
+            throw new \Exception("Não foi possivel recuperar a senha");
+        }
+        else 
+        {
+
+            return $results[0];
+
+        }
+
+    }
+
+    public static function setForgotUsed($idrecovery) 
+    {
+
+        $sql = new Sql();
+
+        $sql->query("UPDATE tb_userspasswordsrecoveries SET dtrecovery = NOW() WHERE idrecovery = :idrecovery", array(
+            ":idrecovery"=>$idrecovery
+        ));
+
+    }
+
+    public function setPassword($password)
+    {
+
+        $sql = new Sql();
+
+        $sql->query("UPDATE tb_users SET despassword = :password WHERE iduser = :iduser", array(
+            ":password"=>$password,
+            ":iduser"=>$this->getiduser()
+        ));
 
     }
 }
