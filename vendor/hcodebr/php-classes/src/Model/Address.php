@@ -58,9 +58,9 @@ class Address extends Model {
          ':idperson'=>$this->getidperson(),
          ':desaddress'=>utf8_decode($this->getdesaddress()),
          ':descomplement'=>utf8_decode($this->getdescomplement()),
-         ':descity'=>$this->utf8_decode(getdescity()),
-         ':desstate'=>$this->utf8_decode(getdesstate()),
-         ':descountry'=>$this->utf8_decode(getdescountry()),
+         ':descity'=>utf8_decode($this->getdescity()),
+         ':desstate'=>utf8_decode($this->getdesstate()),
+         ':descountry'=>utf8_decode($this->getdescountry()),
          ':deszipcode'=>$this->getdeszipcode(),
          ':desdistrict'=>$this->getdesdistrict()
      ]);
